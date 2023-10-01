@@ -2,12 +2,12 @@ namespace EnotPayment
 {
     public class AppSettings
     {
-        public string EnotSignBack { get; set; }
+        public string AdditionalKey { get; set; }
 
-        public string EnotSignFront { get; set; }
+        public string SecretKey { get; set; }
 
-        public string EnotShopId { get; set; }
+        public string ShopId { get; set; }
 
-        public string EnotBaseUrl { get; set; }
+        public string BaseUrl { get; set; }
     }
 }

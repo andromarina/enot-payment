@@ -87,7 +87,7 @@ namespace EnotPayment
         public int status { get; set; }
         public bool status_check { get; set; }
 
-        public string error { get; set; } 
+        public string? error { get; set; } 
 
     }
 
@@ -101,32 +101,32 @@ namespace EnotPayment
 
         public string status { get; set; }
 
-        public double invoice_amount { get; set; }
+        public double? invoice_amount { get; set; }
 
-        public double credited { get; set; }
+        public double? credited { get; set; }
 
         public string currency { get; set; }
 
         public string pay_service { get; set; }
 
-        public double commission_amount { get; set; }
+        public double? commission_amount { get; set; }
 
-        public double commission_percent { get; set; }
+        public double? commission_percent { get; set; }
 
-        public double shop_commission_amount { get; set; }
+        public double? shop_commission_amount { get; set; }
 
-        public double shop_commission_percent { get; set; }
+        public double? shop_commission_percent { get; set; }
 
-        public double user_commission_amount { get; set; }
+        public double? user_commission_amount { get; set; }
 
-        public double user_commission { get; set; }
+        public double? user_commission { get; set; }
 
         public CustomField custom_field { get; set; }
 
-        public string created_at { get; set; }
+        public string? created_at { get; set; }
 
-        public string expired_at { get; set; }
+        public string? expired_at { get; set; }
 
-        public string paid_at { get; set; }
+        public string? paid_at { get; set; }
     }
 }

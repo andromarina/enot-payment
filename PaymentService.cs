@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.WebUtilities;
+﻿using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Security.Cryptography;
@@ -16,7 +15,7 @@ namespace EnotPayment
         public string ProcessPayment(string enotResponce, string signature)
         {
             EnotModelNew enotModel = System.Text.Json.JsonSerializer.Deserialize<EnotModelNew>(enotResponce);
-            string email =enotModel.custom_fields.Email;
+            string email = enotModel.custom_fields.Email;
 
             if (enotModel.code != 1)
             {
@@ -36,13 +35,14 @@ namespace EnotPayment
             }
         }
 
+
+        //https://docs.enot.io/webhook
         private bool ValidateEnotSignature(EnotModelNew enotModel, string signature)
         {
-            // b863ff88afff14abc3ba1812ac2823c65de87701f099f0f0283a862f164e5490
             // Вычисляется хеш из предварительно отсортированных по ключу от a - zA - Z тела
             // хука по алгоритму sha256 hmac без экранированных слешей и unicode символов.
 
-            string key = _appSettings.EnotSignBack;
+            string key = _appSettings.AdditionalKey;
 
             var encoder = new UTF8Encoding();
             var modelAsString = System.Text.Json.JsonSerializer.Serialize(enotModel);
@@ -66,18 +66,15 @@ namespace EnotPayment
         public string GetEnotPaymentLink(string amount, string email)
         {
             amount = amount + ".00";
+            string shopId = _appSettings.ShopId;
             CustomField cf = new CustomField(email);
-            string shopId = _appSettings.EnotShopId;
-
             long id = DateTime.Now.Ticks;
-            double amountDouble;
-            Double.TryParse(amount, out amountDouble);
-         
+                   
 
             WebhookModel createInvoiceModel = new WebhookModel
             {
                 currency = "EUR",
-                email = cf.Email,
+                email = email,
                 expire = 300,
                 amount = amount,
                 custom_fields = System.Text.Json.JsonSerializer.Serialize(cf),
@@ -92,10 +89,12 @@ namespace EnotPayment
 
         private async Task<CreateInvoiceResponce> CreateInvoice(WebhookModel enotInvoiceModel)
         {
-            string secret = _appSettings.EnotSignFront;
-            string enotCreateInvoiceURL = _appSettings.EnotBaseUrl + "/create";
+            string secret = _appSettings.SecretKey;
+            string enotCreateInvoiceURL = _appSettings.BaseUrl + "/create";
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+
+            //https://docs.enot.io/authentication
             httpClient.DefaultRequestHeaders.Add("x-api-key", secret);
 
             var stringPayload = JsonConvert.SerializeObject(enotInvoiceModel);
@@ -103,6 +102,7 @@ namespace EnotPayment
             HttpResponseMessage response = await httpClient.PostAsync(enotCreateInvoiceURL, httpContent);
             string order = await response.Content.ReadAsStringAsync();
 
+            Console.WriteLine(order);
             CreateInvoiceResponce result = System.Text.Json.JsonSerializer.Deserialize<CreateInvoiceResponce>(order);
             if (result.error != null)
             {
@@ -111,11 +111,11 @@ namespace EnotPayment
             return result;
         }
 
-        private async Task<InvoiceDetails> GetInvoiceInfo(string invoiceId)
+        public async Task<InvoiceDetails> GetInvoiceInfo(string invoiceId)
         {
-            string shopId = _appSettings.EnotShopId;
-            string enotGetInvoiceURL = _appSettings.EnotBaseUrl + "/info";
-            string secret = _appSettings.EnotSignFront;
+            string shopId = _appSettings.ShopId;
+            string enotGetInvoiceURL = _appSettings.BaseUrl + "/info";
+            string secret = _appSettings.SecretKey;
 
             var param = new Dictionary<string, string>() { { "invoice_id", invoiceId }, { "shop_id", shopId } };
 

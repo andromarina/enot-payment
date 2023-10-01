@@ -24,7 +24,7 @@ namespace EnotPayment
                 .ConfigureWebHostDefaults(webbuilder =>
                 {
                     webbuilder.UseStartup<Startup>()
-                        .UseUrls("http://localhost:4002");
+                        .UseUrls("https://localhost:4002");
                 });
     }
 
